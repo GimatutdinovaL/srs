@@ -1,0 +1,81 @@
+@startuml
+title Механизм заказа банковской карты
+
+|Клиент|
+start
+:Оформление новой карты;
+
+note right  
+POST/cards
+201 Created
+end note  
+
+
+|#AntiqueWhite|Сервер|
+if (Тип заказа?) then (Перевыпуск)
+  |Клиент|
+  :Указать причину\n(утеря, окончание срока);
+else (Первичный выпуск)
+  |#AntiqueWhite|Сервер|
+  :Проверка наличия счёта\nв Retail Banking;
+  
+note right  
+GET/retail-banking/accounts
+200 OK
+404 Not Found
+end note    
+  
+  if (Счёт найден?) then (Нет)
+    |Клиент|
+    :Предлагается открыть счёт;
+    if (Клиент согласен?) then (Нет)
+      stop
+    endif
+    |#AntiqueWhite|Сервер|
+    :Открыть счёт;
+    
+note right  
+POST/accounts
+201 Created
+end note    
+
+  endif
+endif
+
+|Клиент|
+:Указать адрес доставки;
+
+|#AntiqueWhite|Сервер|
+:Сформировать заявку;
+
+|Клиент|
+:Пройти двухфакторную аутентификацию 2FA;
+
+|#AntiqueWhite|Сервер|
+if (2FA успешна?) then (Нет)
+
+  
+
+
+  |Клиент|
+  :Уведомить клиента об ошибке;
+ 
+
+  stop
+else (Да)
+  |#AntiqueWhite|Сервер|
+  :Отправить заявку в\nСистему выдачи продуктов;
+  
+  note right  
+  Отправляется сообщение в Kafka
+  202 Accepted
+  end note 
+  
+  |Клиент|
+  :Уведомить клиента о принятии заявки;
+  
+  stop
+endif
+
+@enduml
+
