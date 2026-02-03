@@ -3,79 +3,66 @@ title Механизм заказа банковской карты
 
 |Клиент|
 start
-:Оформление новой карты;
-
-note right  
-POST/cards
-201 Created
-end note  
-
+:POST/cards;
 
 |#AntiqueWhite|Сервер|
 if (Тип заказа?) then (Перевыпуск)
-  |Клиент|
-  :Указать причину\n(утеря, окончание срока);
+|Клиент|
+:Указать причину;
 else (Первичный выпуск)
-  |#AntiqueWhite|Сервер|
-  :Проверка наличия счёта\nв Retail Banking;
+|#AntiqueWhite|Сервер|
+:GET/retail-banking/accounts;
   
-note right  
-GET/retail-banking/accounts
-200 OK
-404 Not Found
-end note    
-  
-  if (Счёт найден?) then (Нет)
-    |Клиент|
-    :Предлагается открыть счёт;
-    if (Клиент согласен?) then (Нет)
-      stop
-    endif
-    |#AntiqueWhite|Сервер|
-    :Открыть счёт;
-    
-note right  
-POST/accounts
-201 Created
-end note    
-
+ if (Счёт найден?) then (Нет)
+ |Клиент|
+ :Предлагается открыть счёт;
+  if (Клиент согласен?) then (Нет)
+  :400 Bad Request;  
+  end
   endif
+ endif
+|#AntiqueWhite|Сервер|
+:POST/accounts;
+:201 Created;
+
 endif
 
 |Клиент|
-:Указать адрес доставки;
+:POST/delivery-address;
 
 |#AntiqueWhite|Сервер|
-:Сформировать заявку;
+:Проверка валидации данных;
+if (Данные корректны?) then (Нет)
+|Клиент|
+:400 Bad Request;
+end
+
+else (Да)
+|#AntiqueWhite|Сервер|
+:Создается заявка в БД;
+endif
 
 |Клиент|
 :Пройти двухфакторную аутентификацию 2FA;
 
 |#AntiqueWhite|Сервер|
+
+repeat
+
+:Проверка 2FA;
 if (2FA успешна?) then (Нет)
-
-  
-
-
-  |Клиент|
-  :Уведомить клиента об ошибке;
- 
-
-  stop
 else (Да)
-  |#AntiqueWhite|Сервер|
-  :Отправить заявку в\nСистему выдачи продуктов;
-  
-  note right  
-  Отправляется сообщение в Kafka
-  202 Accepted
-  end note 
-  
-  |Клиент|
-  :Уведомить клиента о принятии заявки;
-  
-  stop
+:Отправить заявку в Kafka;
+|Клиент|
+:200 OK;
+stop
 endif
+
+repeat while (Попыток больше трех?) is (Нет)not (Да)
+
+|Клиент|
+:401 Unauthorized;
+end
 
 @enduml
 
