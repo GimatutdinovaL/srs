@@ -5,58 +5,64 @@ title Механизм заказа банковской карты
 start
 :POST/cards;
 
-|#AntiqueWhite|Сервер|
+|#AntiqueWhite|Сервер| 
 if (Тип заказа?) then (Перевыпуск)
 |Клиент|
-:Указать причину;
+:Указывается причина;
 else (Первичный выпуск)
 |#AntiqueWhite|Сервер|
 :GET/retail-banking/accounts;
   
  if (Счёт найден?) then (Нет)
  |Клиент|
- :Предлагается открыть счёт;
-  if (Клиент согласен?) then (Нет)
-  :400 Bad Request;  
+ 
+  :404 Not Found
+  "Для выпуска необходим 
+  активный счет";  
   end
-  endif
- endif
+else (Да) 
 |#AntiqueWhite|Сервер|
-:POST/accounts;
-:201 Created;
+:Привязывается счет;
 
+endif
 endif
 
 |Клиент|
+repeat
 :POST/delivery-address;
 
 |#AntiqueWhite|Сервер|
-:Проверка валидации данных;
-if (Данные корректны?) then (Нет)
-|Клиент|
-:400 Bad Request;
-end
+:Проверяется валидация данных;
 
-else (Да)
+repeat while (Данные корректны?) is (Нет)not (Да)
+
+
 |#AntiqueWhite|Сервер|
 :Создается заявка в БД;
-endif
+
 
 |Клиент|
-:Пройти двухфакторную аутентификацию 2FA;
+:Предлагается пройти двухфакторную аутентификацию 2FA;
 
 |#AntiqueWhite|Сервер|
 
 repeat
 
-:Проверка 2FA;
+:Проверяется 2FA;
 if (2FA успешна?) then (Нет)
 else (Да)
-:Отправить заявку в Kafka;
+
+fork
+:Отправляется заявка в Kafka;
+fork again
 |Клиент|
 :200 OK;
+end fork
+
 stop
 endif
+
+|#AntiqueWhite|Сервер|
 
 repeat while (Попыток больше трех?) is (Нет)not (Да)
 
