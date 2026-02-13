@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/your-org/bank-cards-api/main/schemas/schema.json",
+  "$id": "https://raw.githubusercontent.com/GimatutdinovaL/srs/refs/heads/main/%D0%BA%D0%B0%D1%80%D1%82%D1%8B.json",
   "title": "OpenAPI-спецификация Сервиса управления банковскими картами",
   "description": "Методы для управления банковскими картами
                  Все схемы запросов и ответов соответствуют JSON Schema не ниже Draft 4",
