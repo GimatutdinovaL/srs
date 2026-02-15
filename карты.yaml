@@ -343,7 +343,6 @@ components:
         id:
           type: string
           format: uuid
-          pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           description: Уникальный идентификатор вида карты
           example: "123e4567-e89b-12d3-a456-426614174000"
         productType:
@@ -733,30 +732,7 @@ components:
               description: Время возникновения ошибки
               example: "2025-01-01T10:30:00Z"
 
-    ValidationError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              example: "VALIDATION_FAILED"
-            message:
-              type: string
-              example: "Validation failed for request body"
-            details:
-              type: array
-              items:
-                type: object
-                properties:
-                  field:
-                    type: string
-                    example: "postalCode"
-                  message:
-                    type: string
-                    example: "must be exactly 6 digits"
-
+                
   responses:
     BadRequestErrorRS:
       description: Невалидный запрос
@@ -775,7 +751,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ValidationError"
+            $ref: "#/components/schemas/Error"
           example:
             error:
               code: "VALIDATION_FAILED"
@@ -823,21 +799,12 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              status:
-                type: integer
-                example: 429
-              error:
-                type: string
-                example: "Too Many Requests"
-              message:
-                type: string
-                example: "Слишком много запросов. Пожалуйста, повторите позже"
+            $ref: "#/components/schemas/Error"  
           example:
-            status: 429
-            error: "Too Many Requests"
-            message: "Слишком много запросов. Пожалуйста, повторите позже"
+            error:
+              code: "TOO_MANY_REQUESTS"
+              message: "Слишком много запросов. Пожалуйста, повторите позже"
+              timestamp: "2025-01-01T10:30:00Z"
 
     UnprocessableEntityErrorRS:
       description: Семантическая ошибка
