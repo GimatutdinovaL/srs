@@ -795,7 +795,7 @@ components:
               timestamp: "2025-12-26T12:00:00Z"
 
     TooManyRequestsErrorRS:
-      description: Превышен лимит запросов к API
+      description: Превышен лимит запросов
       content:
         application/json:
           schema:
@@ -803,7 +803,7 @@ components:
           example:
             error:
               code: "TOO_MANY_REQUESTS"
-              message: "Слишком много запросов. Пожалуйста, повторите позже"
+              message: "Слишком много запросов. Повторите позже"
               timestamp: "2025-01-01T10:30:00Z"
 
     UnprocessableEntityErrorRS:
