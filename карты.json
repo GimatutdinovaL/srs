@@ -17,8 +17,11 @@
           "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
           "description": "HTTP метод"
         }
-      }
+      },
+      "required": ["href", "method"],
+      "additionalProperties": false
     },
+    
     "CardProduct": {
       "type": "object",
       "description": "Вид банковской карты",
@@ -33,8 +36,11 @@
           "enum": ["debit1", "debit2"],
           "description": "Тип карты с тарифом"
         }
-      }
+      },
+      "required": ["id", "productType"],
+      "additionalProperties": false
     },
+    
     "CardProductsRS": {
       "type": "object",
       "description": "Список карт",
@@ -55,10 +61,15 @@
               "$ref": "#/properties/Link",
               "description": "Cсылка на создание зявки на новую карту"
             }
-          }
+          },
+          "required": ["self", "create_card"],
+          "additionalProperties": false
         }
-      }
+      },
+      "required": ["products", "_links"],
+      "additionalProperties": false
     },
+    
     "CardRQ": {
       "type": "object",
       "description": "Запрос на создание заявки на новую карту",
@@ -69,12 +80,13 @@
           "description": "Тип карты с тарифом"
         }
       },
-      "required": ["productType"]
+      "required": ["productType"],
+      "additionalProperties": false
     },
+    
     "CardRS": {
       "type": "object",
       "description": "Ответ на создание заявки на новую карту",
-      "required": ["id", "date", "cardStatus", "productType"],
       "properties": {
         "id": {
           "type": "string",
@@ -110,14 +122,18 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для указания адреса доставки"
             }
-          }
+          },
+          "required": ["self", "cancel", "delivery_address"],
+          "additionalProperties": false
         }
-      }
+      },
+      "required": ["id", "date", "cardStatus", "productType", "_links"],
+      "additionalProperties": false
     },
+    
     "DeliveryAddressCardRQ": {
       "type": "object",
       "description": "Запрос на создание адреса доставки",
-      "required": ["cardId", "country", "city", "street", "houseNumber", "apartment"],
       "properties": {
         "cardId": {
           "type": "string",
@@ -159,12 +175,14 @@
           "maxLength": 200,
           "description": "Комментарий для курьера (опционально)"
         }
-      }
+      },
+      "required": ["cardId", "country", "city", "street", "houseNumber", "apartment"],
+      "additionalProperties": false
     },
+    
     "DeliveryAddressCardRS": {
       "type": "object",
       "description": "Ответ на создание адреса доставки",
-      "required": ["id", "cardId", "createdAt"],
       "properties": {
         "id": {
           "type": "string",
@@ -227,10 +245,15 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для обновления адреса доставки"
             }
-          }
+          },
+          "required": ["self", "update"],
+          "additionalProperties": false
         }
-      }
+      },
+      "required": ["id", "cardId", "createdAt", "_links"],
+      "additionalProperties": false
     },
+    
     "DeliveryAddressUpdateRQ": {
       "type": "object",
       "description": "Запрос на обновление адреса доставки",
@@ -271,12 +294,14 @@
           "maxLength": 200,
           "description": "Комментарий для курьера"
         }
-      }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
     },
+    
     "DeliveryAddressUpdateRS": {
       "type": "object",
       "description": "Ответ на обновление адреса доставки",
-      "required": ["id", "cardId", "updatedAt"],
       "properties": {
         "id": {
           "type": "string",
@@ -336,14 +361,18 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для получения информации об обновленном адресе"
             }
-          }
+          },
+          "required": ["self"],
+          "additionalProperties": false
         }
-      }
+      },
+      "required": ["id", "cardId", "updatedAt", "_links"],
+      "additionalProperties": false
     },
+    
     "TwoFactorAuthRQ": {
       "type": "object",
       "description": "Запрос на двухфакторную аутентификацию",
-      "required": ["code", "sessionId"],
       "properties": {
         "code": {
           "type": "string",
@@ -354,12 +383,14 @@
           "format": "uuid",
           "description": "Идентификатор сессии"
         }
-      }
+      },
+      "required": ["code", "sessionId"],
+      "additionalProperties": false
     },
+    
     "TwoFactorAuthRS": {
       "type": "object",
       "description": "Ответ на двухфакторную аутентификацию",
-      "required": ["accessToken", "refreshToken", "expiresIn"],
       "properties": {
         "accessToken": {
           "type": "string",
@@ -371,21 +402,24 @@
         },
         "expiresIn": {
           "type": "integer",
-          "description": "Время жизни токена в секундах"
+          "description": "Время жизни токена в секундах",
+          "minimum": 1
         },
         "tokenType": {
           "type": "string",
           "description": "Тип токена"
         }
-      }
+      },
+      "required": ["accessToken", "refreshToken", "expiresIn"],
+      "additionalProperties": false
     },
+    
     "Error": {
       "type": "object",
-      "required": ["error"],
+      "description": "Стандартный ответ с ошибкой",
       "properties": {
         "error": {
           "type": "object",
-          "required": ["code", "message", "timestamp"],
           "properties": {
             "code": {
               "type": "string",
@@ -400,39 +434,13 @@
               "format": "date-time",
               "description": "Время возникновения ошибки"
             }
-          }
+          },
+          "required": ["code", "message", "timestamp"],
+          "additionalProperties": false
         }
-      }
-    },
-    "ValidationError": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "object",
-          "properties": {
-            "code": {
-              "type": "string"
-            },
-            "message": {
-              "type": "string"
-            },
-            "details": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "field": {
-                    "type": "string"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      },
+      "required": ["error"],
+      "additionalProperties": false
     }
   }
 }
