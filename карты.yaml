@@ -132,9 +132,9 @@ paths:
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
 
-  /api/v1/cards/{cardId}/status:
+  /api/v1/cards/{cardId}:
     get:
-      summary: Изменения статуса заявки
+      summary: Получение статуса заявки
       description: Отслеживание статуса заявки (Long-polling)
 
       operationId: waitForCardStatus
@@ -203,6 +203,46 @@ paths:
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
 
+    delete:
+      summary: Отмена заявки и удаление данных
+      description: Откат заявки на карту и удаление связанных данных
+      operationId: cancelCard
+      tags:
+        - Card
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: Токен аутентификации
+          schema:
+            type: string
+            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
+        - in: path
+          name: cardId
+          required: true
+          description: ID заявки на карту
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        204:
+          description: Заявка успешно отменена и данные удалены
+        400:
+          $ref: "#/components/responses/BadRequestErrorRS"
+        401:
+          $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"  
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"
+        429:
+          $ref: "#/components/responses/TooManyRequestsErrorRS"
+
+
+
+
+
   /api/v1/delivery-addresses:
     post:
       summary: Указание адреса доставки
@@ -244,7 +284,9 @@ paths:
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
         403:
-          $ref: "#/components/responses/ForbiddenErrorRS" 
+          $ref: "#/components/responses/ForbiddenErrorRS"
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"     
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
     
@@ -313,12 +355,7 @@ paths:
           schema:
             type: string
             example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
-        - in: header
-          name: If-Match
-          description: ETag
-          required: true
-          schema:
-            type: string
+
         - in: path
           name: addressId
           required: true
@@ -338,12 +375,7 @@ paths:
       responses:
         200:
           description: Адрес доставки успешно изменен
-          headers:
-            ETag:
-              description: Новый ETag после обновления
-              schema:
-                type: string
-          
+
           content:
             application/json:
               schema:
@@ -358,49 +390,9 @@ paths:
           $ref: "#/components/responses/NotFoundErrorRS"   
         422:
           $ref: "#/components/responses/UnprocessableEntityErrorRS"
-        412:
-          $ref: "#/components/responses/PreconditionFailedErrorRS"
 
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
-
-  /api/v1/cards/{cardId}:
-    delete:
-      summary: Отмена заявки и удаление данных
-      description: Откат заявки на карту и удаление связанных данных
-      operationId: cancelCard
-      tags:
-        - Card
-      parameters:
-        - in: header
-          name: Authorization
-          required: true
-          description: Токен аутентификации
-          schema:
-            type: string
-            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
-        - in: path
-          name: cardId
-          required: true
-          description: ID заявки на карту
-          schema:
-            type: string
-            format: uuid
-            example: 550e8400-e29b-41d4-a716-446655440000
-      responses:
-        204:
-          description: Заявка успешно отменена и данные удалены
-        400:
-          $ref: "#/components/responses/BadRequestErrorRS"
-        401:
-          $ref: "#/components/responses/UnauthorizedErrorRS"
-        403:
-          $ref: "#/components/responses/ForbiddenErrorRS"  
-        404:
-          $ref: "#/components/responses/NotFoundErrorRS"
-        429:
-          $ref: "#/components/responses/TooManyRequestsErrorRS"
-
 
 
 components:
@@ -546,6 +538,7 @@ components:
 
         _links:
           type: object
+          additionalProperties: false
           properties:
             self:
               $ref: "#/components/schemas/Link"
@@ -693,7 +686,7 @@ components:
           type: string
           minLength: 0
           maxLength: 200
-          description: Комментарий для курьера
+          description: Комментарий для курьера (опционально)
           example: "Код домофона 25К"
         createdAt:
           type: string
@@ -703,6 +696,7 @@ components:
 
         _links:
           type: object
+          additionalProperties: false
           properties:
             self:
               $ref: "#/components/schemas/Link"
@@ -809,7 +803,7 @@ components:
           type: string
           minLength: 0
           maxLength: 200
-          description: Комментарий для курьера
+          description: Комментарий для курьера (опционально)
           example: "Код домофона 25К, этаж 5"
         updatedAt:
           type: string
@@ -819,6 +813,7 @@ components:
 
         _links:
           type: object
+          additionalProperties: false
           properties:
             self:
               $ref: "#/components/schemas/Link"
@@ -890,18 +885,6 @@ components:
               code: "NOT_FOUND"
               message: "Не найдено"
               timestamp: "2025-01-01T10:30:00Z"
-
-    PreconditionFailedErrorRS:
-      description: If-Match precondition failed (412)
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-          example:
-            error:
-              code: "PRECONDITION_FAILED"
-              message: "Данные устарели. Обновите и повторите"
-              timestamp: "2025-12-26T12:00:00Z"
 
     TooManyRequestsErrorRS:
       description: Превышен лимит запросов (429)
