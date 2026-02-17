@@ -18,7 +18,8 @@
           "enum": ["GET", "POST", "PUT", "DELETE"],
           "description": "HTTP метод"
         }
-      }
+      },
+      "required": ["href", "method"]
     },
     "CardProduct": {
       "type": "object",
@@ -92,7 +93,8 @@
         },
         "annualFee": {
           "type": "integer",
-          "description": "Годовое обслуживание в руб."
+          "description": "Годовое обслуживание в рублях",
+          "minimum": 0
         },
         "cashback": {
           "type": "string",
@@ -141,6 +143,8 @@
         },
         "_links": {
           "type": "object",
+          "additionalProperties": false,
+          "required": ["self", "cancel", "delivery_address"],
           "properties": {
             "self": {
               "$ref": "#/properties/Link"
@@ -225,7 +229,6 @@
         },
         "comment": {
           "type": "string",
-          "minLength": 2,
           "maxLength": 200,
           "description": "Комментарий для курьера (опционально)"
         }
@@ -280,7 +283,7 @@
         "comment": {
           "type": "string",
           "maxLength": 200,
-          "description": "Комментарий для курьера"
+          "description": "Комментарий для курьера (опционально)"
         },
         "createdAt": {
           "type": "string",
@@ -289,6 +292,8 @@
         },
         "_links": {
           "type": "object",
+          "additionalProperties": false,
+          "required": ["self", "update"],
           "properties": {
             "self": {
               "$ref": "#/properties/Link"
@@ -392,7 +397,7 @@
         "comment": {
           "type": "string",
           "maxLength": 200,
-          "description": "Комментарий для курьера"
+          "description": "Комментарий для курьера (опционально)"
         },
         "updatedAt": {
           "type": "string",
@@ -401,6 +406,8 @@
         },
         "_links": {
           "type": "object",
+          "additionalProperties": false,
+          "required": ["self"],
           "properties": {
             "self": {
               "$ref": "#/properties/Link",
