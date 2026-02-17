@@ -39,8 +39,51 @@ paths:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"  
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
+
+  /api/v1/card-products/{productId}:
+    get:
+      summary: Получение вида карты по ID
+      description: Получение информации о конкретной карте
+      operationId: getCardProductID
+      tags:
+        - Card
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Информация о продукте
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardProductIDRS"
+        400:
+          $ref: "#/components/responses/BadRequestErrorRS"
+        401:
+          $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"
+        429:
+          $ref: "#/components/responses/TooManyRequestsErrorRS"
+
+
 
   /api/v1/cards:
     post:
@@ -82,6 +125,8 @@ paths:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"  
         422:
           $ref: "#/components/responses/UnprocessableEntityErrorRS"
         429:
@@ -151,10 +196,14 @@ paths:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS" 
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"   
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
 
-  /api/v1/delivery-address:
+  /api/v1/delivery-addresses:
     post:
       summary: Указание адреса доставки
       description: Создание адреса доставки для заявки на карту
@@ -189,17 +238,70 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeliveryAddressCardRS"
+                $ref: "#/components/schemas/DeliveryAddressCreateRS"
         400:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS" 
+        429:
+          $ref: "#/components/responses/TooManyRequestsErrorRS"
+    
+  /api/v1/delivery-addresses/{addressId}:
+    get:
+      summary: Получение адреса доставки
+      description: Получение адреса доставки по уникальному идентификатору адреса 
+      operationId: getDeliveryAddress
+      tags:
+        - Card
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: Токен аутентификации
+          schema:
+            type: string
+            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
+        - in: path
+            name: addressId
+            required: true
+            description: ID адреса доставки
+            schema:
+              type: string
+              format: uuid
+              example: 660e8400-e29b-41d4-a716-446655440000
+      
+      responses:
+        200:
+          description: Успешный ответ с адресом доставки
+          headers:
+            ETag:
+              description: ETag для обновлений
+              schema:
+                type: string
+              example: "a1b2c3d4"
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryAddressCardRS"
+
+        400:
+          $ref: "#/components/responses/BadRequestErrorRS"
+        401:
+          $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"  
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
 
-    patch:
-      summary: Изменить адрес доставки
-      description: Обновление адреса доставки для заявки на карту
+
+    put:
+      summary: Обновить адрес доставки
+      description: Измененние адреса доставки для заявки на карту
       operationId: updateDeliveryAddress
       tags:
         - Card
@@ -213,12 +315,20 @@ paths:
             example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
         - in: header
           name: If-Match
-          description: Ключ идемпотентности
+          description: ETag
           required: true
           schema:
             type: string
+        - in: path
+          name: addressId
+          required: true
+          description: ID адреса доставки
+          schema:
+            type: string
             format: uuid
-            example: 550e8400-e29b-41d4-a716-446655440000
+            example: 660e8400-e29b-41d4-a716-446655440000
+
+
       requestBody:
         required: true
         content:
@@ -228,6 +338,12 @@ paths:
       responses:
         200:
           description: Адрес доставки успешно изменен
+          headers:
+            ETag:
+              description: Новый ETag после обновления
+              schema:
+                type: string
+          
           content:
             application/json:
               schema:
@@ -236,6 +352,10 @@ paths:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS" 
+        404:
+          $ref: "#/components/responses/NotFoundErrorRS"   
         422:
           $ref: "#/components/responses/UnprocessableEntityErrorRS"
         412:
@@ -274,71 +394,35 @@ paths:
           $ref: "#/components/responses/BadRequestErrorRS"
         401:
           $ref: "#/components/responses/UnauthorizedErrorRS"
+        403:
+          $ref: "#/components/responses/ForbiddenErrorRS"  
         404:
           $ref: "#/components/responses/NotFoundErrorRS"
         429:
           $ref: "#/components/responses/TooManyRequestsErrorRS"
 
-  /api/v1/auth/2fa:
-    post:
-      summary: Двухфакторная аутентификация
-      description: Запускается двухфакторная аутентификация
-      operationId: verify2FA
-      tags:
-        - Card
-      parameters:
-        - in: header
-          name: Authorization
-          required: true
-          description: Токен аутентификации
-          schema:
-            type: string
-            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
-        - in: header
-          name: Idempotency-Key
-          description: Ключ идемпотентности
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 550e8400-e29b-41d4-a716-446655440000
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TwoFactorAuthRQ"
-      responses:
-        200:
-          description: Успешная аутентификация
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TwoFactorAuthRS"
-        400:
-          $ref: "#/components/responses/BadRequestErrorRS"
-        401:
-          $ref: "#/components/responses/UnauthorizedErrorRS"
-        429:
-          $ref: "#/components/responses/TooManyRequestsErrorRS"
+
 
 components:
   schemas:
     Link:
       type: object
+      additionalProperties: false
       properties:
         href:
           type: string
           description: URL ссылки
         method:
           type: string
-          enum: [GET, POST, PUT, PATCH, DELETE]
+          enum: [GET, POST, PUT, DELETE]
           description: HTTP метод
           example: GET
 
     CardProduct:
       type: object
+      additionalProperties: false
       description: Вид банковской карты
+      required: [id, productType]
       properties:
         id:
           type: string
@@ -356,7 +440,9 @@ components:
 
     CardProductsRS:
       type: object
+      additionalProperties: false
       description: Список карт
+      required: [products, _links] 
       properties:
         products:
           type: array
@@ -365,6 +451,7 @@ components:
 
         _links:
           type: object
+          additionalProperties: false
           properties:
             self:
               $ref: "#/components/schemas/Link"
@@ -380,8 +467,45 @@ components:
               href: "/api/v1/cards"
               method: "POST"
 
+
+    CardProductIDRS: 
+      type: object
+      additionalProperties: false
+      description: Конкретная информация о карте
+      required: [id, name, productType, description, annualFee, cashback]
+
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор вида карты
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: Название карты
+          example: "Дебетовая карта Classic"
+        productType:
+          type: string
+          enum: [debit1, debit2]
+          description: Тип карты
+          example: "debit1"
+        description:
+          type: string
+          description: Описание карты
+          example: "Дебетовая карта с бесплатным годовым обслуживанием"
+        annualFee:
+          type: integer
+          description: Годовое обслуживание в руб.
+          example: 0
+        cashback:
+          type: string
+          description: Кешбэк
+          example: "1%"
+
+
     CardRQ:
       type: object
+      additionalProperties: false
       description: Запрос на создание заявки на новую карту
       required:
         - productType
@@ -394,8 +518,8 @@ components:
 
     CardRS:
       type: object
-      description: Ответ на создание заявки на новую карту
       additionalProperties: false
+      description: Ответ на создание заявки на новую карту     
       required: [id, date, cardStatus, productType]
 
       properties:
@@ -439,12 +563,43 @@ components:
               href: "/api/v1/cards/550e8400-e29b-41d4-a716-446655440000"
               method: "DELETE"
             delivery_address:
-              href: "/api/v1/delivery-address"
+              href: "/api/v1/delivery-addresses"
               method: "POST"
+
+    DeliveryAddressCreateRS:
+      type: object
+      additionalProperties: false
+      description: Ответ на создание адреса доставки 
+      required: [id, _links]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор созданного адреса
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        _links:
+          type: object
+          additionalProperties: false
+          required:
+            - self
+          properties:
+            self:
+              $ref: "#/components/schemas/Link"
+            update:
+              $ref: "#/components/schemas/Link"
+          example:
+            self:
+              href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
+              method: "GET"
+            update:
+              href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
+              method: "PUT"
+
 
     DeliveryAddressCardRQ:
       type: object
-      description: Запрос на создание адреса доставки
+      additionalProperties: false
+      description: Запрос на получение адреса доставки
       required: [cardId, country, city, street, houseNumber, apartment]
       properties:
         cardId:
@@ -490,8 +645,8 @@ components:
 
     DeliveryAddressCardRS:
       type: object
-      description: Ответ на создание адреса доставки
       additionalProperties: false
+      description: Ответ на получение адреса доставки     
       required: [id, cardId, createdAt]
       properties:
         id:
@@ -556,14 +711,15 @@ components:
               description: "Ссылка для обновления адреса доставки"
           example:
             self:
-              href: "/api/v1/delivery-address/660e8400-e29b-41d4-a716-446655440000"
+              href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
               method: "GET"
             update:
-              href: "/api/v1/delivery-address"
-              method: "PATCH"
+              href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
+              method: "PUT"
 
     DeliveryAddressUpdateRQ:
       type: object
+      additionalProperties: false
       description: Запрос на обновление адреса доставки
       properties:
         country:
@@ -605,8 +761,8 @@ components:
 
     DeliveryAddressUpdateRS:
       type: object
-      description: Ответ на обновление адреса доставки
       additionalProperties: false
+      description: Ответ на обновление адреса доставки
       required: [id, cardId, updatedAt]
       properties:
         id:
@@ -669,53 +825,22 @@ components:
               description: "Ссылка для получения информации об обновленном адресе"
           example:
             self:
-              href: "/api/v1/delivery-address/660e8400-e29b-41d4-a716-446655440000"
+              href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
               method: "GET"
 
-    TwoFactorAuthRQ:
-      type: object
-      description: Запрос на двухфакторную аутентификацию
-      required: [code, sessionId]
-      properties:
-        code:
-          type: string
-          description: Код подтверждения из SMS
-          example: "123456"
-        sessionId:
-          type: string
-          format: uuid
-          description: Идентификатор сессии
-          example: "770e8400-e29b-41d4-a716-446655440000"
 
-    TwoFactorAuthRS:
-      type: object
-      description: Ответ на двухфакторную аутентификацию
-      required: [accessToken, refreshToken, expiresIn]
-      properties:
-        accessToken:
-          type: string
-          description: JWT токен доступа
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ"
-        refreshToken:
-          type: string
-          description: Токен для обновления доступа
-          example: "refresh_880e8400-e29b-41d4-a716-446655440000"
-        expiresIn:
-          type: integer
-          description: Время жизни токена в секундах
-          example: 3600
-        tokenType:
-          type: string
-          description: Тип токена
-          example: "Bearer"
+
+
 
     Error:
       type: object
+      additionalProperties: false
       required:
         - error
       properties:
         error:
           type: object
+          additionalProperties: false
           required: [code, message, timestamp]
           properties:
             code:
@@ -735,7 +860,7 @@ components:
                 
   responses:
     BadRequestErrorRS:
-      description: Невалидный запрос
+      description: Невалидный запрос (400)
       content:
         application/json:
           schema:
@@ -746,20 +871,8 @@ components:
               message: "Неверный формат запроса"
               timestamp: "2025-01-01T10:30:00Z"
 
-    ValidationErrorRS:
-      description: Ошибки валидации полей запроса
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-          example:
-            error:
-              code: "VALIDATION_FAILED"
-              message: "Ошибка валидации запроса"
-              timestamp: "2025-01-01T10:30:00Z"
-
     UnauthorizedErrorRS:
-      description: Требуется аутентификация
+      description: Требуется аутентификация (401)
       content:
         application/json:
           schema:
@@ -771,7 +884,7 @@ components:
               timestamp: "2025-01-01T10:30:00Z"
 
     NotFoundErrorRS:
-      description: Ресурс не найден
+      description: Ресурс не найден (404)
       content:
         application/json:
           schema:
@@ -783,7 +896,7 @@ components:
               timestamp: "2025-01-01T10:30:00Z"
 
     PreconditionFailedErrorRS:
-      description: If-Match precondition failed
+      description: If-Match precondition failed (412)
       content:
         application/json:
           schema:
@@ -795,7 +908,7 @@ components:
               timestamp: "2025-12-26T12:00:00Z"
 
     TooManyRequestsErrorRS:
-      description: Превышен лимит запросов
+      description: Превышен лимит запросов (429)
       content:
         application/json:
           schema:
@@ -807,7 +920,7 @@ components:
               timestamp: "2025-01-01T10:30:00Z"
 
     UnprocessableEntityErrorRS:
-      description: Семантическая ошибка
+      description: Семантическая ошибка (422)
       content:
         application/json:
           schema:
@@ -816,4 +929,16 @@ components:
             error:
               code: "UNPROCESSABLE_ENTITY"
               message: "Невозможно отменить проведенную операцию"
+              timestamp: "2025-01-01T10:30:00Z"
+
+    ForbiddenErrorRS:
+      description: Доступ запрещен (403)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: "FORBIDDEN"
+              message: "Проверьте доступ"
               timestamp: "2025-01-01T10:30:00Z"
