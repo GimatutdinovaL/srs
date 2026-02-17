@@ -7,6 +7,7 @@
   "properties": {
     "Link": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "href": {
           "type": "string",
@@ -14,17 +15,16 @@
         },
         "method": {
           "type": "string",
-          "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          "enum": ["GET", "POST", "PUT", "DELETE"],
           "description": "HTTP метод"
         }
-      },
-      "required": ["href", "method"],
-      "additionalProperties": false
+      }
     },
-    
     "CardProduct": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Вид банковской карты",
+      "required": ["id", "productType"],
       "properties": {
         "id": {
           "type": "string",
@@ -36,14 +36,13 @@
           "enum": ["debit1", "debit2"],
           "description": "Тип карты с тарифом"
         }
-      },
-      "required": ["id", "productType"],
-      "additionalProperties": false
+      }
     },
-    
     "CardProductsRS": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Список карт",
+      "required": ["products", "_links"],
       "properties": {
         "products": {
           "type": "array",
@@ -53,40 +52,72 @@
         },
         "_links": {
           "type": "object",
+          "additionalProperties": false,
+          "required": ["self", "create_card"],
           "properties": {
             "self": {
               "$ref": "#/properties/Link"
             },
             "create_card": {
               "$ref": "#/properties/Link",
-              "description": "Cсылка на создание зявки на новую карту"
+              "description": "Ссылка на создание заявки на новую карту"
             }
-          },
-          "required": ["self", "create_card"],
-          "additionalProperties": false
+          }
         }
-      },
-      "required": ["products", "_links"],
-      "additionalProperties": false
+      }
     },
-    
+    "CardProductIDRS": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Конкретная информация о карте",
+      "required": ["id", "name", "productType", "description", "annualFee", "cashback"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Уникальный идентификатор вида карты"
+        },
+        "name": {
+          "type": "string",
+          "description": "Название карты"
+        },
+        "productType": {
+          "type": "string",
+          "enum": ["debit1", "debit2"],
+          "description": "Тип карты"
+        },
+        "description": {
+          "type": "string",
+          "description": "Описание карты"
+        },
+        "annualFee": {
+          "type": "integer",
+          "description": "Годовое обслуживание в руб."
+        },
+        "cashback": {
+          "type": "string",
+          "description": "Кешбэк"
+        }
+      }
+    },
     "CardRQ": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Запрос на создание заявки на новую карту",
+      "required": ["productType"],
       "properties": {
         "productType": {
           "type": "string",
           "enum": ["debit1", "debit2"],
           "description": "Тип карты с тарифом"
         }
-      },
-      "required": ["productType"],
-      "additionalProperties": false
+      }
     },
-    
     "CardRS": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Ответ на создание заявки на новую карту",
+      "required": ["id", "date", "cardStatus", "productType"],
       "properties": {
         "id": {
           "type": "string",
@@ -122,18 +153,41 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для указания адреса доставки"
             }
-          },
-          "required": ["self", "cancel", "delivery_address"],
-          "additionalProperties": false
+          }
         }
-      },
-      "required": ["id", "date", "cardStatus", "productType", "_links"],
-      "additionalProperties": false
+      }
     },
-    
+    "DeliveryAddressCreateRS": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ответ на создание адреса доставки",
+      "required": ["id", "_links"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Уникальный идентификатор созданного адреса"
+        },
+        "_links": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["self"],
+          "properties": {
+            "self": {
+              "$ref": "#/properties/Link"
+            },
+            "update": {
+              "$ref": "#/properties/Link"
+            }
+          }
+        }
+      }
+    },
     "DeliveryAddressCardRQ": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Запрос на создание адреса доставки",
+      "required": ["cardId", "country", "city", "street", "houseNumber", "apartment"],
       "properties": {
         "cardId": {
           "type": "string",
@@ -175,14 +229,13 @@
           "maxLength": 200,
           "description": "Комментарий для курьера (опционально)"
         }
-      },
-      "required": ["cardId", "country", "city", "street", "houseNumber", "apartment"],
-      "additionalProperties": false
+      }
     },
-    
     "DeliveryAddressCardRS": {
       "type": "object",
-      "description": "Ответ на создание адреса доставки",
+      "additionalProperties": false,
+      "description": "Ответ на получение адреса доставки",
+      "required": ["id", "cardId", "createdAt"],
       "properties": {
         "id": {
           "type": "string",
@@ -226,7 +279,6 @@
         },
         "comment": {
           "type": "string",
-          "minLength": 0,
           "maxLength": 200,
           "description": "Комментарий для курьера"
         },
@@ -245,17 +297,13 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для обновления адреса доставки"
             }
-          },
-          "required": ["self", "update"],
-          "additionalProperties": false
+          }
         }
-      },
-      "required": ["id", "cardId", "createdAt", "_links"],
-      "additionalProperties": false
+      }
     },
-    
     "DeliveryAddressUpdateRQ": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Запрос на обновление адреса доставки",
       "properties": {
         "country": {
@@ -290,18 +338,16 @@
         },
         "comment": {
           "type": "string",
-          "minLength": 0,
           "maxLength": 200,
           "description": "Комментарий для курьера"
         }
-      },
-      "minProperties": 1,
-      "additionalProperties": false
+      }
     },
-    
     "DeliveryAddressUpdateRS": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Ответ на обновление адреса доставки",
+      "required": ["id", "cardId", "updatedAt"],
       "properties": {
         "id": {
           "type": "string",
@@ -345,7 +391,6 @@
         },
         "comment": {
           "type": "string",
-          "minLength": 0,
           "maxLength": 200,
           "description": "Комментарий для курьера"
         },
@@ -361,65 +406,19 @@
               "$ref": "#/properties/Link",
               "description": "Ссылка для получения информации об обновленном адресе"
             }
-          },
-          "required": ["self"],
-          "additionalProperties": false
+          }
         }
-      },
-      "required": ["id", "cardId", "updatedAt", "_links"],
-      "additionalProperties": false
+      }
     },
-    
-    "TwoFactorAuthRQ": {
-      "type": "object",
-      "description": "Запрос на двухфакторную аутентификацию",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Код подтверждения из SMS"
-        },
-        "sessionId": {
-          "type": "string",
-          "format": "uuid",
-          "description": "Идентификатор сессии"
-        }
-      },
-      "required": ["code", "sessionId"],
-      "additionalProperties": false
-    },
-    
-    "TwoFactorAuthRS": {
-      "type": "object",
-      "description": "Ответ на двухфакторную аутентификацию",
-      "properties": {
-        "accessToken": {
-          "type": "string",
-          "description": "JWT токен доступа"
-        },
-        "refreshToken": {
-          "type": "string",
-          "description": "Токен для обновления доступа"
-        },
-        "expiresIn": {
-          "type": "integer",
-          "description": "Время жизни токена в секундах",
-          "minimum": 1
-        },
-        "tokenType": {
-          "type": "string",
-          "description": "Тип токена"
-        }
-      },
-      "required": ["accessToken", "refreshToken", "expiresIn"],
-      "additionalProperties": false
-    },
-    
     "Error": {
       "type": "object",
-      "description": "Стандартный ответ с ошибкой",
+      "additionalProperties": false,
+      "required": ["error"],
       "properties": {
         "error": {
           "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message", "timestamp"],
           "properties": {
             "code": {
               "type": "string",
@@ -434,13 +433,9 @@
               "format": "date-time",
               "description": "Время возникновения ошибки"
             }
-          },
-          "required": ["code", "message", "timestamp"],
-          "additionalProperties": false
+          }
         }
-      },
-      "required": ["error"],
-      "additionalProperties": false
+      }
     }
   }
 }
