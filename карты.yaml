@@ -264,13 +264,13 @@ paths:
             type: string
             example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwi
         - in: path
-            name: addressId
-            required: true
-            description: ID адреса доставки
-            schema:
-              type: string
-              format: uuid
-              example: 660e8400-e29b-41d4-a716-446655440000
+          name: addressId
+          required: true
+          description: ID адреса доставки
+          schema:
+            type: string
+            format: uuid
+            example: 660e8400-e29b-41d4-a716-446655440000
       
       responses:
         200:
@@ -827,10 +827,6 @@ components:
             self:
               href: "/api/v1/delivery-addresses/660e8400-e29b-41d4-a716-446655440000"
               method: "GET"
-
-
-
-
 
     Error:
       type: object
