@@ -2,10 +2,10 @@
 
 entity Card_order
 {  
-card_order_id: UUID "RK"
+card_order_id: UUID {PK}
 
-customer_id: uuid 
-product_id: uuid "FK"
+customer_id: UUID
+product_id: UUID {FK}
 status: varchar(20)
 created_at: timestamp
 updated_at: timestamp
@@ -13,9 +13,9 @@ updated_at: timestamp
 
 entity Address 
 {
-address_id: UUID "RK"
+address_id: UUID {PK}
 
-card_order_id: uuid "FK"
+card_order_id: UUID {PK}
 country: varchar(50)
 city: varchar(50)
 street: varchar(200)
@@ -28,7 +28,7 @@ updated_at: timestamp
 
 entity Product
 {
-product_id: UUID "RK"
+product_id: UUID {PK}
 
 name: varchar(100)
 product_type: varchar(20)
@@ -39,9 +39,9 @@ updated_at: timestamp
 
 entity Card
 {
-card_id: UUID "RK"
+card_id: UUID {PK}
 
-card_order_id: uuid "FK"
+card_order_id: UUID {FK}
 card_name: varchar(200)
 card_number: varchar(19) 
 expiry_date: date
