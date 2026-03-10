@@ -53,3 +53,5 @@ status: varchar(20)
 Card_order ||--|| Address
 Product ||--o{ Card_order
 Card_order ||--|| Card
+
+@enduml
