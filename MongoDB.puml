@@ -1,0 +1,28 @@
+@startuml
+
+  class Customer {
+    _id: ObjectId
+    customer_id: UUID
+    personal: Personal
+    contact: Contact
+    created_at: datetime
+    updated_at: datetime
+  }
+
+  class Personal {
+    first_name: string
+    last_name: string
+    middle_name: string
+    birth_date: date
+    passport_number: string
+  }
+
+  class Contact {
+    phone: string
+    email: string
+  }
+
+  Customer "1" *-- "1" Personal
+  Customer "1" *-- "1" Contact
+
+@enduml
