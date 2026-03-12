@@ -2,52 +2,54 @@
 
 entity Card_order
 {  
-card_order_id: UUID <<PK>> 
+card_order_id <<PK>> 
 
-customer_id: UUID
-product_id: UUID <<FK>> 
-status: varchar(20)
-created_at: timestamp
-updated_at: timestamp
+customer_id
+product_id: <<FK>> 
+status
+created_at
+updated_at
 } 
 
 entity Address 
 {
-address_id: UUID <<PK>> 
+address_id: <<PK>> 
 
-card_order_id: UUID <<FK>> 
-country: varchar(50)
-city: varchar(50)
-street: varchar(200)
-house_number: varchar(10)
-apartment: varchar(10)
-comment: varchar(200)
-created_at: timestamp
-updated_at: timestamp
+card_order_id: <<FK>> 
+country
+city
+street
+house_number
+apartment
+comment
+created_at
+updated_at
 }
 
 entity Product
 {
-product_id: UUID <<PK>> 
+product_id: <<PK>> 
 
-name: varchar(100)
-product_type: varchar(20)
-cashback: varchar(50)
-created_at: timestamp
-updated_at: timestamp
+name:
+product_type
+cashback
+created_at
+updated_at
 }
 
 entity Card
 {
-card_id: UUID <<PK>> 
+card_id <<PK>> 
 
-card_order_id: UUID <<FK>> 
-card_name: varchar(200)
-card_number: varchar(19) 
-expiry_date: date
-cvv: varchar(3)
-issue_date: timestamp
-status: varchar(20)
+card_order_id <<FK>> 
+card_name
+card_number
+expiry_date
+cvv
+issue_date
+status
+created_at
+updated_at
 }
 
 Card_order ||--|| Address
