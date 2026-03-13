@@ -13,9 +13,8 @@ updated_at
 
 entity Address 
 {
-address_id: <<PK>> 
 
-card_order_id: <<FK>> 
+card_order_id: <<PK>> 
 country
 city
 street
@@ -39,9 +38,8 @@ updated_at
 
 entity Card
 {
-card_id <<PK>> 
 
-card_order_id <<FK>> 
+card_order_id <<PK>> 
 card_name
 card_number
 expiry_date
